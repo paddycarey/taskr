@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style type="text/css">
+  #breadcrumb {
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+  }
+  #subsubhead {
+    display: inline;
+  }
+  #subtask-table {
+    margin-top: 10px;
+  }
+  #add-subtask-button {
+    margin-bottom: 10px;
+  }
+ .progress {
+    margin-bottom: 0px;
+  }
+  #pm-subhead {
+    text-align: center;
+  }
+  #no-tasks {
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block subhead %}
+{{ task.name }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<ul class="breadcrumb" id="breadcrumb">
+  <li><a href="/t/">Projects</a> <span class="divider">/</span></li>
+  {% for crumb in task.breadcrumbs() %}
+    <li><a href="{{ uri_for('task-view', task_id=crumb['task_id']) }}">{{ crumb['name'] }}</a> <span class="divider">/</span></li>
+  {% endfor %}
+  <li class="active">{{ task.name }}</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+
+{% set task_add_url = uri_for('task-add', task_id=task.key.urlsafe()) %}
+{% set task_add_user_url = uri_for('task-add-user', task_id=task.key.urlsafe()) %}
+{% set task_reassign_url = uri_for('task-reassign', task_id=task.key.urlsafe()) %}
+{% set task_comment_url = uri_for('task-comment', task_id=task.key.urlsafe()) %}
+{% set task_completion_url = uri_for('task-completion', task_id=task.key.urlsafe()) %}
+{% set projects_or_tasks = 'subtasks' %}
+
+<div class="row">
+  <div class="span12">
+    <h4 id="subsubhead">Subtasks</h4>
+    <a id="add-subtask-button" class="btn btn-inverse btn-small pull-right" href="{{ task_add_url }}">
+        New Subtask
+    </a>
+    {% include 'subtask_table.html' %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="span4">
+    <div class="row">
+      <div class="span4">
+        <div class="well">
+          <form class="form" id="reassign-form" method="POST" action="{{ task_reassign_url }}">
+
+            <div class="control-group">
+              {{ reassign_form.assigned_to.label(class="control-label") }}
+              <div class="controls">
+                {{ reassign_form.assigned_to(onchange="this.form.submit()") }}
+              </div>
+            </div>
+
+          </form>
+          <form class="form" id="completion-form" method="POST" action="{{ task_completion_url }}">
+
+            <div class="control-group">
+              {{ completion_form.task_completion_status.label(class="control-label") }}
+              <div class="controls">
+                {% if task.subtasks_count > 0 %}
+                  {{ completion_form.task_completion_status(onchange="this.form.submit()", disabled=true) }}
+                {% else %}
+                  {{ completion_form.task_completion_status(onchange="this.form.submit()") }}
+                {% endif %}
+              </div>
+            </div>
+
+          </form>
+          {% if task.is_top_level %}
+            <hr>
+            <div id="pm-subhead"><h4>Project Members</h4></div>
+            <hr>
+            {% if is_admin %}
+              <form class="form" id="add-user-form" method="POST" action="{{ task_add_user_url }}">
+                <div class="control-group">
+                  {{ add_user_form.user.label(class="control-label") }}
+                  <div class="controls">
+                    {{ add_user_form.user(onchange="this.form.submit()") }}
+                  </div>
+                </div>
+              </form>
+            {% endif %}
+            {% for task_user in task_users %}
+
+              <div class="media">
+                  <img class="media-object pull-left" style="width: 24px; height: 24px;" src="{{ task_user.gravatar }}">
+                <div class="media-body">
+                  <h5 class="media-heading">{{ task_user.given_name }} {{ task_user.family_name }}</h5>
+                </div>
+              </div>
+
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="span8">
+
+    <div class="row">
+      <div class="span8">
+        <div class="well">
+          <h4>Description</h4>
+          <p>{{ task.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span8">
+        <div class="well">
+          <h4>Comments ({{ task.comments_count }} total)</h4>
+          {% for comment in task.comments(from_comment=from_comment) %}
+            {% set user = comment.user.get() %}
+            <hr>
+            <div class="media">
+                <img class="media-object pull-left" style="width: 24px; height: 24px;" src="{{ user.gravatar }}">
+              <div class="media-body">
+                <h5 class="media-heading">{{ user.given_name }} {{ user.family_name }}: {{format_timedelta(comment.age(), locale='en_GB') }} ago</h5>
+              </div>
+              {{ comment.comment }}
+            </div>
+          {% else %}
+            <hr>
+            <h5>No comments</h5>
+          {% endfor %}
+          <hr>
+          {% if from_comment != None %}
+            <a class="pull-left btn btn-default btn-small" href="{{ uri_for('task-view', task_id=task.key.urlsafe()) }}">
+              <i class="icon-fast-backward icon-white"></i> Start of comments
+            </a>
+          {% endif %}
+          {% if task.comments_count > 5 and len(task.comments(from_comment=from_comment)) == 5 %}
+            <a class="pull-right btn btn-inverse btn-small" href="{{ uri_for('task-view', task_id=task.key.urlsafe()) }}?from_comment={{ task.comments(from_comment=from_comment)[4].key.urlsafe() }}">
+              Next Page <i class="icon-forward icon-white"></i>
+            </a>
+          {% endif %}
+          <br>
+          <hr>
+          <form class="form" id="comment-form" method="POST" action="{{ task_comment_url }}">
+
+            <div class="control-group">
+              <div class="controls">
+                {{ comment_form.comment(class="input input-xxlarge") }}
+              </div>
+            </div>
+
+            <div class="control-group">
+              <div class="controls">
+                <button type="submit" class="btn btn-inverse">Add comment</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span8">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <th>Description</th>
+            {% if task.subtasks_count > 0 %}
+              <th>What</th>
+            {% endif %}
+            <th>Actioned by</th>
+            <th>When</th>
+          </thead>
+          <tbody>
+            {% for row in task.history %}
+              <tr>
+                <td>{{ row.description }}</td>
+                {% if task.subtasks_count > 0 %}
+                  <td>
+                    <a href="{{ row.what()['link'] }}">{{ row.what()['name'] }}</a>
+                  </td>
+                {% endif %}
+                <td>{{ row.who }}</td>
+                <td>{{ format_timedelta(row.when, locale='en_GB') }} ago</td>
+              </tr>
+            {% else %}
+              <tr>
+                {% if task.subtasks_count > 0 %}
+                  <td colspan="4" id="no-tasks"><strong>No history</strong></td>
+                {% else %}
+                  <td colspan="3" id="no-tasks"><strong>No history</strong></td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

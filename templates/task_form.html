@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style type="text/css">
+  #add-form {
+    margin-top: 20px;
+  }
+  .form-errors {
+    margin: 0 0 0px 25px;
+  }
+  #description {
+    min-height: 120px;
+    max-width: 530px;
+  }
+</style>
+
+</style>
+{% endblock %}
+
+{% block subhead %}
+Add new {{ task_or_project }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+
+  <form class="form-horizontal" id="add-form" method="POST">
+
+    <div class="control-group {% if form.name.errors %}error{% endif %}">
+      {{ form.name.label(class="control-label") }}
+      <div class="controls">
+        {{ form.name(class="input input-xxlarge") }}
+        {% if form.name.errors %}
+          <span class="help-block">
+          <ul class="form-errors">
+            {% for error in form.name.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.description.errors %}error{% endif %}">
+      {{ form.description.label(class="control-label") }}
+      <div class="controls">
+        {{ form.description(class="input input-xxlarge") }}
+        {% if form.description.errors %}
+          <span class="help-block">
+          <ul class="form-errors">
+            {% for error in form.description.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="control-group {% if form.task_time_estimate.errors %}error{% endif %}">
+      {{ form.task_time_estimate.label(class="control-label") }}
+      <div class="controls">
+        {{ form.task_time_estimate(class="input input-xxlarge") }}
+        {% if form.task_time_estimate.errors %}
+          <span class="help-block">
+          <ul class="form-errors">
+            {% for error in form.task_time_estimate.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-inverse">Save {{ task_or_project }}</button>
+      </div>
+    </div>
+
+  </form>
+
+</div> <!-- /container -->
+{% endblock %}

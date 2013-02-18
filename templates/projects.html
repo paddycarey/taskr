@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style type="text/css">
+  #breadcrumb {
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+  }
+  #subsubhead {
+    display: inline;
+  }
+  #subtask-table {
+    margin-top: 10px;
+  }
+  #add-project-button {
+    margin-bottom: 10px;
+  }
+  #no-tasks {
+    text-align: center;
+  }
+  .progress {
+    margin-bottom: 0px;
+  }
+</style>
+{% endblock %}
+
+{% block subhead %}
+Your Projects
+{% endblock %}
+
+{% block breadcrumbs %}
+<ul class="breadcrumb" id="breadcrumb">
+  <li class="active">Projects</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+
+{% set subtasks = projects %}
+{% set project_add_url = uri_for('project-add') %}
+{% set projects_or_tasks = 'projects' %}
+
+<div class="row">
+  <div class="span12">
+    <h4 id="subsubhead">View all your active projects</h4>
+    {% if is_admin %}
+    <a id="add-project-button" class="btn btn-inverse btn-small pull-right" href="{{ project_add_url }}">
+        New Project
+    </a>
+    {% endif %}
+    {% include 'subtask_table.html' %}
+  </div>
+</div>
+
+{% endblock %}

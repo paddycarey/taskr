@@ -1,0 +1,44 @@
+<table class="table table-bordered table-hover table-striped" id="subtask-table">
+  <thead>
+    <th>Name</th>
+    <th>Assigned to</th>
+    <th>Time Estimate</th>
+    <th colspan="2">Status</th>
+  </thead>
+  <tbody>
+    {% for subtask in subtasks %}
+      <tr>
+        <td>
+          <a href="{{ uri_for('task-view', task_id=subtask.key.urlsafe()) }}">{{ subtask.name }}</a>
+          {% if subtask.subtasks_count > 0 %}
+            &nbsp;<span class="label label-inverse">{{ subtask.subtasks_count }} subtasks</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if subtask.assigned_to == None %}
+            Not assigned
+          {% else %}
+            {{ subtask.assigned_to.get().given_name }}
+          {% endif %}
+        </td>
+        <td>
+          {{ subtask.time_estimate }} minutes
+        </td>
+        <td style="min-width: 100px">
+          <div class="progress progress-striped">
+            <div class="bar" style="width: {{ subtask.completion_status }}%;"></div>
+          </div>
+        </td>
+        <td>
+          <span class="label label-inverse">{{ subtask.completion_status }}%</span>
+        </td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="4" id="no-tasks">
+            <strong>No {{ projects_or_tasks }}</strong>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

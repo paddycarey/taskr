@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}taskr{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+      #user-details {
+        text-align: right;
+        padding-top: 5px;
+      }
+      hr {
+        margin: 20px 0;
+      }
+      #subhead {
+        color: #666666;
+      }
+      #header-link {
+        color: rgb(51, 51, 51);
+        text-decoration: none;
+      }
+    </style>
+    {% block extra_css %}{% endblock %}
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/static/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="span8">
+                <h1 style="display: inline;"><a href="/" id='header-link'>taskr!</a></h1>
+                <h3 style="display: inline;" id="subhead">{% block subhead %}{% endblock %}</h3>
+            </div>
+            {% if user != None %}
+            <div class="span4 visible-desktop">
+                <div class="media">
+                    <a class="pull-right" href="#">
+                        <img class="media-object" data-src="holder.js/64x64" alt="64x64" style="width: 48px; height: 48px;" src="{{ user.gravatar }}">
+                    </a>
+                    <div class="media-body" id="user-details">
+                        <h4 class="media-heading">
+                            {{ user.given_name }} {{ user.family_name }}
+                        </h4>
+                        {{ user.user_email }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <hr>
+
+        {% for message in session.get_flashes() %}
+        <div class="alert">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            {{ message[0] }}
+        </div>
+        {% endfor %}
+
+        {% block breadcrumbs %}
+        {% endblock %}
+
+        {% block content %}
+        {% endblock %}
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+
+  </body>
+</html>
