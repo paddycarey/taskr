@@ -20,7 +20,7 @@ ROUTES = [
 
     RedirectRoute(
         r'/t/<task_id>/add_user/',
-        'handlers.template.forms.AddUserToTaskHandler',
+        'handlers.template.forms.AddUserToProjectHandler',
         name="task-add-user",
         handler_method='get',
         strict_slash=True,
