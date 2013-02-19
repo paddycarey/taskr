@@ -1,4 +1,5 @@
 # third-party imports
+from google.appengine.ext import ndb
 from wtforms import Form
 from wtforms import IntegerField
 from wtforms import SelectField
@@ -38,13 +39,20 @@ def add_user_to_task_form(task, post_data):
     only forms for adding users to tasks
     """
 
+    @ndb.tasklet
+    def get_all_users():
+        # choices for select field
+        all_users = User.query().order(User.family_name)
+        all_users_list = yield all_users.map_async(lambda x: (x.key.urlsafe(), str(x.given_name) + ' ' + str(x.family_name)))
+        raise ndb.Return(all_users_list)
+
     def choices():
         # choices for select field
-        all_users = User.query().order(User.family_name).iter(keys_only=True)
-        task_users = task.project.get().users
-        fhoices = [(uk.urlsafe(), str(uk.get().given_name) + ' ' + str(uk.get().family_name)) for uk in all_users if not uk in task_users]
-        fhoices = [('None', '--------')] + fhoices
-        return fhoices
+        task_users = [x.urlsafe() for x in task.project.get().users]
+        all_users = get_all_users().get_result()
+        unassigned_users = [x for x in all_users if not x[0] in task_users]
+        unassigned_users = [('None', '--------')] + unassigned_users
+        return unassigned_users
 
     class AddUserToTaskForm(Form):
 
@@ -91,8 +99,8 @@ def reassign_task_form(task, post_data, with_default=True):
 
         def choices(self):
             # choices for select field
-            users = task.project.get().users
-            fhoices = [(uk.urlsafe(), str(uk.get().given_name) + ' ' + str(uk.get().family_name)) for uk in users]
+            users = (x.get_result() for x in ndb.get_multi_async(task.project.get().users))
+            fhoices = [(x.key.urlsafe(), str(x.given_name) + ' ' + str(x.family_name)) for x in users]
             fhoices = [('None', '--------')] + fhoices
             return fhoices
 
