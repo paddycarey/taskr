@@ -6,7 +6,8 @@
     <th colspan="2">Status</th>
   </thead>
   <tbody>
-    {% for subtask in subtasks %}
+    {% for subtask_future in subtasks %}
+      {% set subtask = subtask_future.get_result() %}
       <tr>
         <td>
           <a href="{{ uri_for('task-view', task_id=subtask.key.urlsafe()) }}">{{ subtask.name }}</a>

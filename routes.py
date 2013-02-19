@@ -11,16 +11,16 @@ ROUTES = [
 
     RedirectRoute(
         r'/t/new/',
-        'handlers.admin.AddProjectHandler',
+        'handlers.template.forms.AddProjectHandler',
         name="project-add",
-        handler_method='get',
+        handler_method='handle',
         strict_slash=True,
         methods=['GET', 'POST'],
     ),
 
     RedirectRoute(
         r'/t/<task_id>/add_user/',
-        'handlers.admin.AddUserToTaskHandler',
+        'handlers.template.forms.AddUserToTaskHandler',
         name="task-add-user",
         handler_method='get',
         strict_slash=True,
@@ -33,58 +33,59 @@ ROUTES = [
 
     Route(
         r'/',
-        'handlers.user.IndexHandler',
+        'handlers.template.general.IndexHandler',
         name="user-template-index"
     ),
 
     RedirectRoute(
         r'/t/',
-        'handlers.user.ProjectHandler',
+        'handlers.template.task.ProjectHandler',
         name="projects",
         strict_slash=True,
     ),
 
     RedirectRoute(
         r'/t/<task_id>/',
-        'handlers.user.ViewTaskHandler',
+        'handlers.template.task.ViewTaskHandler',
         name="task-view",
         strict_slash=True,
     ),
 
     RedirectRoute(
         r'/t/<task_id>/new/',
-        'handlers.user.AddTaskHandler',
+        'handlers.template.forms.AddTaskHandler',
         name="task-add",
-        handler_method='get',
+        handler_method='handle',
         strict_slash=True,
         methods=['GET', 'POST'],
     ),
 
     RedirectRoute(
         r'/t/<task_id>/reassign/',
-        'handlers.user.ReassignTaskHandler',
+        'handlers.template.forms.ReassignTaskHandler',
         name="task-reassign",
-        handler_method='get',
         strict_slash=True,
-        methods=['POST'],
     ),
 
     RedirectRoute(
         r'/t/<task_id>/completion/',
-        'handlers.user.CompletionTaskHandler',
+        'handlers.template.forms.ChangeCompletionStatusTaskHandler',
         name="task-completion",
-        handler_method='get',
         strict_slash=True,
-        methods=['POST'],
     ),
 
     RedirectRoute(
         r'/t/<task_id>/comment/',
-        'handlers.user.AddCommentHandler',
+        'handlers.template.forms.AddCommentHandler',
         name="task-comment",
-        handler_method='get',
         strict_slash=True,
-        methods=['POST'],
+    ),
+
+    RedirectRoute(
+        r'/t/<task_id>/<comment_cursor>/',
+        'handlers.template.task.ViewTaskHandler',
+        name="task-view-comment-page",
+        strict_slash=True,
     ),
 
     #############################
@@ -92,8 +93,14 @@ ROUTES = [
     #############################
 
     Route(
+        r'/update_profile',
+        'handlers.template.profile.UpdateProfileHandler',
+        name="update-profile"
+    ),
+
+    Route(
         r'/auth_callback',
-        'handlers.auth.CallbackHandler',
+        'handlers.template.auth.CallbackHandler',
         name="oauth-callback"
     ),
 

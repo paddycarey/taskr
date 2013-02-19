@@ -97,6 +97,15 @@ class Task(BaseModel):
         return key
     project = ndb.ComputedProperty(_project)
 
+    # query that'll retrieve 5 comments from the
+    # datastore for this task, starting at the
+    # specified ID, or at the start if no ID is specified
+    def comments(self):
+        q = Comment.query(ancestor=self.key)
+        q = q.filter(Comment.task == self.key)
+        q = q.order(-Comment.creation_time)
+        return q
+
     ######################################
     # Helper functions to perform common #
     # repetitive actions for tasks       #
@@ -114,19 +123,6 @@ class Task(BaseModel):
             entity = key.get()
             crumbs.append({'name': entity.name, 'task_id': key.urlsafe()})
         return reversed(crumbs)
-
-    # query that'll retrieve 5 comments from the
-    # datastore for this task, starting at the
-    # specified ID, or at the start if no ID is specified
-    def comments(self, from_comment=None):
-        q = Comment.query(ancestor=self.key)
-        q = q.filter(Comment.task == self.key)
-        if from_comment is not None:
-            from_comment_key = ndb.Key(urlsafe=from_comment)
-            from_comment_time = from_comment_key.get().creation_time
-            q = q.filter(Comment.creation_time < from_comment_time)
-        q = q.order(-Comment.creation_time)
-        return [c.get() for c in q.iter(limit=5, keys_only=True)]
 
     @property
     def history(self):

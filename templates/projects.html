@@ -43,7 +43,7 @@ Your Projects
 <div class="row">
   <div class="span12">
     <h4 id="subsubhead">View all your active projects</h4>
-    {% if is_admin %}
+    {% if is_admin(user) %}
     <a id="add-project-button" class="btn btn-inverse btn-small pull-right" href="{{ project_add_url }}">
         New Project
     </a>

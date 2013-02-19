@@ -42,7 +42,7 @@ def add_user_to_task_form(task, post_data):
         # choices for select field
         all_users = User.query().order(User.family_name).iter(keys_only=True)
         task_users = task.project.get().users
-        fhoices = [(uk.urlsafe(), uk.get().given_name + ' ' + uk.get().family_name) for uk in all_users if not uk in task_users]
+        fhoices = [(uk.urlsafe(), str(uk.get().given_name) + ' ' + str(uk.get().family_name)) for uk in all_users if not uk in task_users]
         fhoices = [('None', '--------')] + fhoices
         return fhoices
 
@@ -92,7 +92,7 @@ def reassign_task_form(task, post_data, with_default=True):
         def choices(self):
             # choices for select field
             users = task.project.get().users
-            fhoices = [(uk.urlsafe(), uk.get().given_name + ' ' + uk.get().family_name) for uk in users]
+            fhoices = [(uk.urlsafe(), str(uk.get().given_name) + ' ' + str(uk.get().family_name)) for uk in users]
             fhoices = [('None', '--------')] + fhoices
             return fhoices
 

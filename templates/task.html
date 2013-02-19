@@ -103,8 +103,8 @@
                 </div>
               </form>
             {% endif %}
-            {% for task_user in task_users %}
-
+            {% for task_user_future in task_users %}
+              {% set task_user = task_user_future.get_result() %}
               <div class="media">
                   <img class="media-object pull-left" style="width: 24px; height: 24px;" src="{{ task_user.gravatar }}">
                 <div class="media-body">
@@ -133,7 +133,8 @@
       <div class="span8">
         <div class="well">
           <h4>Comments ({{ task.comments_count }} total)</h4>
-          {% for comment in task.comments(from_comment=from_comment) %}
+          {% set comments, cursor, more = comments.get_result() %}
+          {% for comment in comments %}
             {% set user = comment.user.get() %}
             <hr>
             <div class="media">
@@ -148,13 +149,13 @@
             <h5>No comments</h5>
           {% endfor %}
           <hr>
-          {% if from_comment != None %}
+          {% if comment_cursor != None %}
             <a class="pull-left btn btn-default btn-small" href="{{ uri_for('task-view', task_id=task.key.urlsafe()) }}">
               <i class="icon-fast-backward icon-white"></i> Start of comments
             </a>
           {% endif %}
-          {% if task.comments_count > 5 and len(task.comments(from_comment=from_comment)) == 5 %}
-            <a class="pull-right btn btn-inverse btn-small" href="{{ uri_for('task-view', task_id=task.key.urlsafe()) }}?from_comment={{ task.comments(from_comment=from_comment)[4].key.urlsafe() }}">
+          {% if task.comments_count > 5 and more == True %}
+            <a class="pull-right btn btn-inverse btn-small" href="{{ uri_for('task-view-comment-page', task_id=task.key.urlsafe(), comment_cursor=cursor.urlsafe()) }}">
               Next Page <i class="icon-forward icon-white"></i>
             </a>
           {% endif %}

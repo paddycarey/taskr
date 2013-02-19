@@ -17,6 +17,12 @@ indexes:
   - name: creation_time
     direction: desc
 
+- kind: History
+  ancestor: yes
+  properties:
+  - name: creation_time
+    direction: desc
+
 - kind: Task
   properties:
   - name: is_top_level
@@ -27,9 +33,3 @@ indexes:
   - name: is_top_level
   - name: users
   - name: creation_time
-
-- kind: History
-  ancestor: yes
-  properties:
-  - name: creation_time
-    direction: desc
