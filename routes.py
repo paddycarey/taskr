@@ -22,7 +22,7 @@ ROUTES = [
         r'/t/<task_id>/add_user/',
         'handlers.template.forms.AddUserToProjectHandler',
         name="task-add-user",
-        handler_method='get',
+        handler_method='post',
         strict_slash=True,
         methods=['POST'],
     ),
