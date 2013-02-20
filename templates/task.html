@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% set task_add_url = uri_for('task-add', task_id=task.key.urlsafe()) %}
+{% set task_edit_url = uri_for('task-edit', task_id=task.key.urlsafe()) %}
+{% set task_add_user_url = uri_for('task-add-user', task_id=task.key.urlsafe()) %}
+{% set task_reassign_url = uri_for('task-reassign', task_id=task.key.urlsafe()) %}
+{% set task_comment_url = uri_for('task-comment', task_id=task.key.urlsafe()) %}
+{% set task_completion_url = uri_for('task-completion', task_id=task.key.urlsafe()) %}
+{% set projects_or_tasks = 'subtasks' %}
+
 {% block extra_css %}
 <style type="text/css">
   #breadcrumb {
@@ -28,7 +36,7 @@
 {% endblock %}
 
 {% block subhead %}
-{{ task.name }}
+{{ task.name }} <a href="{{ task_edit_url }}"><i class="icon-edit"></i></a>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -42,14 +50,6 @@
 {% endblock %}
 
 {% block content %}
-
-{% set task_add_url = uri_for('task-add', task_id=task.key.urlsafe()) %}
-{% set task_edit_url = uri_for('task-edit', task_id=task.key.urlsafe()) %}
-{% set task_add_user_url = uri_for('task-add-user', task_id=task.key.urlsafe()) %}
-{% set task_reassign_url = uri_for('task-reassign', task_id=task.key.urlsafe()) %}
-{% set task_comment_url = uri_for('task-comment', task_id=task.key.urlsafe()) %}
-{% set task_completion_url = uri_for('task-completion', task_id=task.key.urlsafe()) %}
-{% set projects_or_tasks = 'subtasks' %}
 
 <div class="row">
   <div class="span12">
@@ -94,7 +94,7 @@
             <hr>
             <div id="pm-subhead"><h4>Project Members</h4></div>
             <hr>
-            {% if is_admin %}
+            {% if is_admin(user) %}
               <form class="form" id="add-user-form" method="POST" action="{{ task_add_user_url }}">
                 <div class="control-group">
                   {{ add_user_form.user.label(class="control-label") }}
@@ -136,12 +136,14 @@
           <h4>Comments ({{ task.comments_count }} total)</h4>
           {% set comments, cursor, more = comments.get_result() %}
           {% for comment in comments %}
-            {% set user = comment.user.get() %}
+            {% set c_user = comment.user.get() %}
             <hr>
             <div class="media">
-                <img class="media-object pull-left" style="width: 24px; height: 24px;" src="{{ user.gravatar }}">
+                <img class="media-object pull-left" style="width: 24px; height: 24px;" src="{{ c_user.gravatar }}">
               <div class="media-body">
-                <h5 class="media-heading">{{ user.given_name }} {{ user.family_name }}: {{format_timedelta(comment.age(), locale='en_GB') }} ago</h5>
+                <h5 class="media-heading">
+                  {{ c_user.given_name }} {{ c_user.family_name }}: {{format_timedelta(comment.age(), locale='en_GB') }} ago{% if is_admin(user) or c_user.key.urlsafe() == user.key.urlsafe() %} <a href="{{ uri_for('task-comment-delete', task_id=task.key.urlsafe(), comment_id=comment.key.urlsafe()) }}"><i class="icon-remove-sign"></i></a>{% endif %}
+                </h5>
               </div>
               {{ comment.comment }}
             </div>

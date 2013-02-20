@@ -91,6 +91,13 @@ ROUTES = [
     ),
 
     RedirectRoute(
+        r'/t/<task_id>/comment/<comment_id>/delete/',
+        'handlers.template.forms.DeleteCommentHandler',
+        name="task-comment-delete",
+        strict_slash=True,
+    ),
+
+    RedirectRoute(
         r'/t/<task_id>/<comment_cursor>/',
         'handlers.template.task.ViewTaskHandler',
         name="task-view-comment-page",

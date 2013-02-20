@@ -373,7 +373,7 @@ class DeleteCommentHandler(AuthedTemplateHandler):
     POST only route allowing to delete comments
     """
 
-    def post(self, comment_id):
+    def get(self, task_id, comment_id):
 
         # reconstruct comment key and pull entity from datastore
         comment_key = ndb.Key(urlsafe=comment_id)
@@ -381,12 +381,15 @@ class DeleteCommentHandler(AuthedTemplateHandler):
         # pull task from datastore
         task = comment.task.get()
 
+        if not comment.task.urlsafe() == task_id:
+            return self.abort(400, detail='Task/Comment mismatch')
+
         # users can only delete their own comments
-        if not self.user_entity.key == comment.user:
+        if not self.user_entity.key == comment.user and not is_admin(self.user_entity):
             return self.abort(403, detail="Users can only delete their own comments")
 
         # delete comment entity
-        comment.delete()
+        comment_key.delete()
         # re-save task so as to recalculate all computed
         # fields right the way up to project level
         task.put()
