@@ -44,6 +44,7 @@
 {% block content %}
 
 {% set task_add_url = uri_for('task-add', task_id=task.key.urlsafe()) %}
+{% set task_edit_url = uri_for('task-edit', task_id=task.key.urlsafe()) %}
 {% set task_add_user_url = uri_for('task-add-user', task_id=task.key.urlsafe()) %}
 {% set task_reassign_url = uri_for('task-reassign', task_id=task.key.urlsafe()) %}
 {% set task_comment_url = uri_for('task-comment', task_id=task.key.urlsafe()) %}
@@ -123,7 +124,7 @@
     <div class="row">
       <div class="span8">
         <div class="well">
-          <h4>Description</h4>
+          <h4>Description <a href="{{ task_edit_url }}"><i class="icon-edit"></i></a></h4>
           <p>{{ task.description }}</p>
         </div>
       </div>

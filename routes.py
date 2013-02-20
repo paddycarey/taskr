@@ -61,6 +61,15 @@ ROUTES = [
     ),
 
     RedirectRoute(
+        r'/t/<task_id>/edit/',
+        'handlers.template.forms.EditTaskHandler',
+        name="task-edit",
+        handler_method='handle',
+        strict_slash=True,
+        methods=['GET', 'POST'],
+    ),
+
+    RedirectRoute(
         r'/t/<task_id>/reassign/',
         'handlers.template.forms.ReassignTaskHandler',
         name="task-reassign",

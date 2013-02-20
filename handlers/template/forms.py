@@ -63,7 +63,7 @@ class AddProjectHandler(AuthedTemplateHandler):
             return self.redirect(redirect_url)
 
         # render form and display
-        context = {'form': form, 'task_or_project': 'project'}
+        context = {'form': form, 'task_or_project': 'project', 'add_or_edit': 'Add new'}
         return self.render_response('task_form.html', context)
 
 
@@ -159,6 +159,53 @@ class AddTaskHandler(AuthedTemplateHandler):
 
         # render form and return (rendering errors if necessary)
         context = {'form': form, 'task_or_project': 'task'}
+        return self.render_response('task_form.html', context)
+
+
+class EditTaskHandler(AuthedTemplateHandler):
+
+    """
+    Form handler to allow admin users to add new top-level
+    tasks (projects) to the datastore.
+    """
+
+    def handle(self, task_id):
+
+        # pull project from datastore or issue 404
+        task = ndb.Key(urlsafe=task_id).get()
+        if task is None:
+            return self.abort(404, 'Project not found')
+
+        # check if user has admin permissions
+        if task.is_top_level:
+            if not is_admin(self.user_entity):
+                return self.abort(401, detail="Admin permissions required")
+            task_or_project = 'project'
+        else:
+            task_or_project = 'task'
+
+        # populate form with POST data (if available)
+        form = TaskForm(self.request.POST, task)
+
+        # check if form was POSTed and that user input validates
+        if self.request.method == 'POST' and form.validate():
+
+            # populate task from form
+            form.populate_obj(task)
+            # store task in datastore
+            task.put()
+
+            # record history item
+            history_text = '%s edited' % task_or_project.capitalize()
+            add_to_history(task, self.user_entity, history_text)
+            self.session.add_flash(history_text)
+
+            # redirect to task view on succesful save
+            redirect_url = self.uri_for('task-view', task_id=task.key.urlsafe())
+            return self.redirect(redirect_url)
+
+        # render form and display
+        context = {'form': form, 'task_or_project': task_or_project, 'add_or_edit': 'Editing'}
         return self.render_response('task_form.html', context)
 
 
