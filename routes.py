@@ -27,6 +27,13 @@ ROUTES = [
         methods=['POST'],
     ),
 
+    RedirectRoute(
+        r'/t/<task_id>/remove_user/<user_id>/',
+        'handlers.template.forms.RemoveUserFromProjectHandler',
+        name="task-remove-user",
+        strict_slash=True,
+    ),
+
     ####################################
     # User facing template/form routes #
     ####################################

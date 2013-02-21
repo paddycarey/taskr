@@ -117,6 +117,44 @@ class AddUserToProjectHandler(AuthedTemplateHandler):
         return self.redirect(redirect_url)
 
 
+class RemoveUserFromProjectHandler(AuthedTemplateHandler):
+
+    """
+    POST only route allowing to delete users from projects
+    """
+
+    def get(self, task_id, user_id):
+
+        # reconstruct user key from url
+        user_key = ndb.Key(urlsafe=user_id)
+        # pull task from datastore
+        task_key = ndb.Key(urlsafe=task_id)
+        task = task_key.get()
+
+        if not task.is_top_level:
+            return self.abort(403, detail="Can only remove users from projects")
+
+        if not user_key in task.users:
+            return self.abort(404, detail='User not assigned to project')
+
+        # only admin users can modify user lists
+        if not is_admin(self.user_entity):
+            return self.abort(403, detail="Need admin permissions")
+
+        # delete comment entity
+        task.users.remove(user_key)
+        # re-save task so as to recalculate all computed
+        # fields right the way up to project level
+        task.put()
+
+        # add flash msg to indicate success
+        self.session.add_flash('User successfully removed from task')
+
+        # redirect to task view page
+        redirect_url = self.uri_for('task-view', task_id=task.key.urlsafe())
+        return self.redirect(redirect_url)
+
+
 #############################
 # User-facing form handlers #
 #############################

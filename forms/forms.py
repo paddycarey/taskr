@@ -61,7 +61,7 @@ def add_user_to_task_form(task, post_data):
         """
 
         # user task is assigned to
-        user = SelectField(u'Add user to task', choices=choices())
+        user = SelectField(u'Add user to project', choices=choices())
 
     # init form
     form = AddUserToTaskForm(post_data)

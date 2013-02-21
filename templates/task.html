@@ -6,7 +6,6 @@
 {% set task_reassign_url = uri_for('task-reassign', task_id=task.key.urlsafe()) %}
 {% set task_comment_url = uri_for('task-comment', task_id=task.key.urlsafe()) %}
 {% set task_completion_url = uri_for('task-completion', task_id=task.key.urlsafe()) %}
-{% set projects_or_tasks = 'subtasks' %}
 
 {% block extra_css %}
 <style type="text/css">
@@ -57,6 +56,7 @@
     <a id="add-subtask-button" class="btn btn-inverse btn-small pull-right" href="{{ task_add_url }}">
         New Subtask
     </a>
+    {% set projects_or_tasks = 'subtasks' %}
     {% include 'subtask_table.html' %}
   </div>
 </div>
@@ -109,7 +109,7 @@
               <div class="media">
                   <img class="media-object pull-left" style="width: 24px; height: 24px;" src="{{ task_user.gravatar }}">
                 <div class="media-body">
-                  <h5 class="media-heading">{{ task_user.given_name }} {{ task_user.family_name }}</h5>
+                  <h5 class="media-heading">{{ task_user.given_name }} {{ task_user.family_name }}{% if is_admin(user) %}  <a href="{{ uri_for('task-remove-user', task_id=task.key.urlsafe(), user_id=task_user.key.urlsafe()) }}"><i class="icon-remove-sign"></i></a>{% endif %}</h5>
                 </div>
               </div>
 
